@@ -1,4 +1,6 @@
 int[][] sudokuBoard = new int[9][9];
+int[][] solutionBoard = new int[9][9];
+boolean[][] fixedCells = new boolean[9][9];
 int[][] grid = new int[9][9];
 int cellSize = 50;
 int selectedRow = -1;
@@ -17,14 +19,22 @@ void draw() {
 }
 
 void generateSudoku() {
-  sudokuBoard = generateSolvedSudoku();
+  int[][] fullSolution = generateSolvedSudoku();
+  
+  for (int i = 0; i < 9; i++) {
+    for (int j = 0; j < 9; j++) {
+      solutionBoard[i][j] = fullSolution[i][j];
+    }
+  }
   
   for (int i = 0; i < 9; i++) {
     for (int j = 0; j < 9; j++) {
       if (random(1) < 0.5) {
-        sudokuBoard[i][j] = sudokuBoard[i][j];
+        sudokuBoard[i][j] = fullSolution[i][j];
+        fixedCells[i][j] = true;
       } else {
         sudokuBoard[i][j] = 0;
+        fixedCells[i][j] = false;
       }
     }
   }
@@ -120,8 +130,16 @@ void drawNumbers() {
   textSize(32);
   for (int i = 0; i < 9; i++) {
     for (int j = 0; j < 9; j++) {
-      if (sudokuBoard[i][j] != 0) { 
-        fill(0);
+      if (sudokuBoard[i][j] != 0) {
+        if (fixedCells[i][j]) {
+          fill(0);
+        } else {
+          if (sudokuBoard[i][j] == solutionBoard[i][j]) {
+            fill(0, 255, 0);
+          } else {
+            fill(255, 0, 0); 
+          }
+        }
         text(sudokuBoard[i][j], j * cellSize + cellSize / 2, i * cellSize + cellSize / 2);
       }
     }
@@ -148,7 +166,9 @@ void mousePressed() {
 
 void keyPressed() {
   if (selectedRow != -1 && selectedCol != -1 && key >= '1' && key <= '9') {
-    int enteredNumber = key - '0';
-    sudokuBoard[selectedRow][selectedCol] = enteredNumber;
+    if (!fixedCells[selectedRow][selectedCol]) {
+      int enteredNumber = key - '0';
+      sudokuBoard[selectedRow][selectedCol] = enteredNumber;
+    }
   }
 }
