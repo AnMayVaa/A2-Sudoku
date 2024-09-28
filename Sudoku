@@ -9,6 +9,9 @@ int selectedCol = -1;
 int startTime;
 int elapsedTime;
 
+int mistakes = 0;
+int maxMistakes = 3;
+boolean gameOver = false;
 boolean gameWon = false;
 
 void setup() {
@@ -23,11 +26,14 @@ void draw() {
   drawNumbers();
   highlightSelectedCell();
   
-  if (gameWon) {
+  if (!gameOver && !gameWon) {
+    displayTimer();
+    displayMistakes();
+    checkWinCondition();
+  } else if (gameWon) {
     displayWinMessage();
   } else {
-    displayTimer();
-    checkWinCondition();
+    displayGameOverMessage();
   }
 }
 
@@ -160,7 +166,7 @@ void drawNumbers() {
 }
 
 void highlightSelectedCell() {
-  if (selectedRow != -1 && selectedCol != -1  && !gameWon) {
+  if (selectedRow != -1 && selectedCol != -1 && !gameOver && !gameWon) {
     noFill();
     stroke(255, 0, 0);
     strokeWeight(3);
@@ -169,7 +175,7 @@ void highlightSelectedCell() {
 }
 
 void mousePressed() {
-  if (!gameWon) {
+  if (!gameOver && !gameWon) {
     int col = mouseX / cellSize;
     int row = mouseY / cellSize;
     if (col < 9 && row < 9) {
@@ -181,9 +187,16 @@ void mousePressed() {
 
 void keyPressed() {
   if (selectedRow != -1 && selectedCol != -1 && key >= '1' && key <= '9') {
-    if (!fixedCells[selectedRow][selectedCol] && !gameWon) {
+    if (!fixedCells[selectedRow][selectedCol] && !gameOver && !gameWon) {
       int enteredNumber = key - '0';
       sudokuBoard[selectedRow][selectedCol] = enteredNumber;
+      
+      if (sudokuBoard[selectedRow][selectedCol] != solutionBoard[selectedRow][selectedCol]) {
+        mistakes++;
+        if (mistakes >= maxMistakes) {
+          gameOver = true;
+        }
+      }
     }
   }
 }
@@ -195,11 +208,24 @@ void displayTimer() {
   text("Time: " + elapsedTime + "s", width / 2, 500);
 }
 
+void displayMistakes() {
+  fill(0);
+  textSize(24);
+  text("Mistakes: " + mistakes + "/" + maxMistakes, width / 2, 540);
+}
+
 void displayWinMessage() {
   textSize(36);
   fill(0, 255, 0);
   textAlign(CENTER);
   text("You Win!", width / 2, 530);
+}
+
+void displayGameOverMessage() {
+  textSize(36);
+  fill(255, 0, 0);
+  textAlign(CENTER);
+  text("Game Over", width / 2, 530);
 }
 
 void checkWinCondition() {
