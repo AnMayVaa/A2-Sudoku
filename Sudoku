@@ -1,9 +1,15 @@
 int cellSize = 50;
+int selectedRow = -1;
+int selectedCol = -1;
 
 void setup() {
   size(450, 450);
+}
+
+void draw() {
   background(255);
   drawGrid();
+  highlightSelectedCell();
 }
 
 void drawGrid() {
@@ -16,5 +22,23 @@ void drawGrid() {
     }
     line(i * cellSize, 0, i * cellSize, 9 * cellSize);
     line(0, i * cellSize, 9 * cellSize, i * cellSize);
+  }
+}
+
+void highlightSelectedCell() {
+  if (selectedRow != -1 && selectedCol != -1) {
+    noFill();
+    stroke(255, 0, 0);
+    strokeWeight(3);
+    rect(selectedCol * cellSize, selectedRow * cellSize, cellSize, cellSize);
+  }
+}
+
+void mousePressed() {
+  int col = mouseX / cellSize;
+  int row = mouseY / cellSize;
+  if (col < 9 && row < 9) {
+    selectedCol = col;
+    selectedRow = row;
   }
 }
