@@ -38,6 +38,8 @@ void draw() {
 }
 
 void generateSudoku() {
+  clearGrid();
+  
   int[][] fullSolution = generateSolvedSudoku();
   
   for (int i = 0; i < 9; i++) {
@@ -199,6 +201,13 @@ void keyPressed() {
       }
     }
   }
+  if (key == 'S' || key == 's') {
+    saveGame();
+  }
+
+  if (key == 'L' || key == 'l') {
+    loadGame();
+  }
 }
 
 void displayTimer() {
@@ -242,5 +251,109 @@ void checkWinCondition() {
   
   if (allCorrect) {
     gameWon = true;
+  }
+}
+
+void saveGame() {
+  String[] gameData = new String[0];
+  
+  gameData = append(gameData, "SUDOKU_BOARD");
+  for (int i = 0; i < 9; i++) {
+    String row = "";
+    for (int j = 0; j < 9; j++) {
+      row += sudokuBoard[i][j] + (j < 8 ? "," : "");
+    }
+    gameData = append(gameData, row);
+  }
+  
+  gameData = append(gameData, "SOLUTION_BOARD");
+  for (int i = 0; i < 9; i++) {
+    String row = "";
+    for (int j = 0; j < 9; j++) {
+      row += solutionBoard[i][j] + (j < 8 ? "," : "");
+    }
+    gameData = append(gameData, row);
+  }
+  
+  gameData = append(gameData, "FIXED_CELLS");
+  for (int i = 0; i < 9; i++) {
+    String row = "";
+    for (int j = 0; j < 9; j++) {
+      row += (fixedCells[i][j] ? "1" : "0") + (j < 8 ? "," : "");
+    }
+    gameData = append(gameData, row);
+  }
+  
+  gameData = append(gameData, "MISTAKES," + mistakes);
+  gameData = append(gameData, "TIME_ELAPSED," + elapsedTime);
+  gameData = append(gameData, "GAME_OVER," + (gameOver ? "1" : "0"));
+  
+  saveStrings("sudoku_save.txt", gameData);
+  println("Game saved in a readable format.");
+}
+
+
+void loadGame() {
+  String[] gameData = loadStrings("sudoku_save.txt");
+  
+  if (gameData == null) {
+    println("No save file found.");
+    return;
+  }
+  
+  int index = 0;
+  
+  while (!gameData[index].equals("SUDOKU_BOARD")) index++;
+  index++;
+  for (int i = 0; i < 9; i++) {
+    String[] row = split(gameData[index], ",");
+    for (int j = 0; j < 9; j++) {
+      sudokuBoard[i][j] = int(row[j]);
+    }
+    index++;
+  }
+  
+  while (!gameData[index].equals("SOLUTION_BOARD")) index++;
+  index++;
+  for (int i = 0; i < 9; i++) {
+    String[] row = split(gameData[index], ",");
+    for (int j = 0; j < 9; j++) {
+      solutionBoard[i][j] = int(row[j]);
+    }
+    index++;
+  }
+  
+  while (!gameData[index].equals("FIXED_CELLS")) index++;
+  index++;
+  for (int i = 0; i < 9; i++) {
+    String[] row = split(gameData[index], ",");
+    for (int j = 0; j < 9; j++) {
+      fixedCells[i][j] = row[j].equals("1");
+    }
+    index++;
+  }
+  
+  while (!gameData[index].startsWith("MISTAKES")) index++;
+  mistakes = int(split(gameData[index], ",")[1]);
+  index++;
+  
+  while (!gameData[index].startsWith("TIME_ELAPSED")) index++;
+  elapsedTime = int(split(gameData[index], ",")[1]);
+  index++;
+  
+  while (!gameData[index].startsWith("GAME_OVER")) index++;
+  gameOver = split(gameData[index], ",")[1].equals("1");
+  
+  startTime = millis() - (elapsedTime * 1000);
+  
+  println("Game loaded from a readable format.");
+}
+
+void clearGrid() {
+  for (int i = 0; i < 9; i++) {
+    for (int j = 0; j < 9; j++) {
+      sudokuBoard[i][j] = 0;
+      fixedCells[i][j] = false;
+    }
   }
 }
