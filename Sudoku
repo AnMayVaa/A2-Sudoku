@@ -1,3 +1,4 @@
+int[][] sudokuBoard = new int[9][9];
 int cellSize = 50;
 int selectedRow = -1;
 int selectedCol = -1;
@@ -9,6 +10,7 @@ void setup() {
 void draw() {
   background(255);
   drawGrid();
+  drawNumbers();
   highlightSelectedCell();
 }
 
@@ -22,6 +24,19 @@ void drawGrid() {
     }
     line(i * cellSize, 0, i * cellSize, 9 * cellSize);
     line(0, i * cellSize, 9 * cellSize, i * cellSize);
+  }
+}
+
+void drawNumbers() {
+  textAlign(CENTER, CENTER);
+  textSize(32);
+  for (int i = 0; i < 9; i++) {
+    for (int j = 0; j < 9; j++) {
+      if (sudokuBoard[i][j] != 0) { 
+        fill(0);
+        text(sudokuBoard[i][j], j * cellSize + cellSize / 2, i * cellSize + cellSize / 2);
+      }
+    }
   }
 }
 
@@ -40,5 +55,12 @@ void mousePressed() {
   if (col < 9 && row < 9) {
     selectedCol = col;
     selectedRow = row;
+  }
+}
+
+void keyPressed() {
+  if (selectedRow != -1 && selectedCol != -1 && key >= '1' && key <= '9') {
+    int enteredNumber = key - '0';
+    sudokuBoard[selectedRow][selectedCol] = enteredNumber;
   }
 }
