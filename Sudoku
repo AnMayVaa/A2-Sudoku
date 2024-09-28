@@ -6,9 +6,13 @@ int cellSize = 50;
 int selectedRow = -1;
 int selectedCol = -1;
 
+int startTime;
+int elapsedTime;
+
 void setup() {
-  size(450, 450);
+  size(450, 600);
   generateSudoku();
+  startTime = millis();
 }
 
 void draw() {
@@ -16,6 +20,8 @@ void draw() {
   drawGrid();
   drawNumbers();
   highlightSelectedCell();
+  
+  displayTimer();
 }
 
 void generateSudoku() {
@@ -171,4 +177,11 @@ void keyPressed() {
       sudokuBoard[selectedRow][selectedCol] = enteredNumber;
     }
   }
+}
+
+void displayTimer() {
+  fill(0);
+  textSize(24);
+  elapsedTime = (millis() - startTime) / 1000;
+  text("Time: " + elapsedTime + "s", width / 2, 500);
 }
