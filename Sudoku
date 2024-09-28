@@ -9,6 +9,8 @@ int selectedCol = -1;
 int startTime;
 int elapsedTime;
 
+boolean gameWon = false;
+
 void setup() {
   size(450, 600);
   generateSudoku();
@@ -21,7 +23,12 @@ void draw() {
   drawNumbers();
   highlightSelectedCell();
   
-  displayTimer();
+  if (gameWon) {
+    displayWinMessage();
+  } else {
+    displayTimer();
+    checkWinCondition();
+  }
 }
 
 void generateSudoku() {
@@ -153,7 +160,7 @@ void drawNumbers() {
 }
 
 void highlightSelectedCell() {
-  if (selectedRow != -1 && selectedCol != -1) {
+  if (selectedRow != -1 && selectedCol != -1  && !gameWon) {
     noFill();
     stroke(255, 0, 0);
     strokeWeight(3);
@@ -162,17 +169,19 @@ void highlightSelectedCell() {
 }
 
 void mousePressed() {
-  int col = mouseX / cellSize;
-  int row = mouseY / cellSize;
-  if (col < 9 && row < 9) {
-    selectedCol = col;
-    selectedRow = row;
+  if (!gameWon) {
+    int col = mouseX / cellSize;
+    int row = mouseY / cellSize;
+    if (col < 9 && row < 9) {
+      selectedCol = col;
+      selectedRow = row;
+    }
   }
 }
 
 void keyPressed() {
   if (selectedRow != -1 && selectedCol != -1 && key >= '1' && key <= '9') {
-    if (!fixedCells[selectedRow][selectedCol]) {
+    if (!fixedCells[selectedRow][selectedCol] && !gameWon) {
       int enteredNumber = key - '0';
       sudokuBoard[selectedRow][selectedCol] = enteredNumber;
     }
@@ -184,4 +193,28 @@ void displayTimer() {
   textSize(24);
   elapsedTime = (millis() - startTime) / 1000;
   text("Time: " + elapsedTime + "s", width / 2, 500);
+}
+
+void displayWinMessage() {
+  textSize(36);
+  fill(0, 255, 0);
+  textAlign(CENTER);
+  text("You Win!", width / 2, 530);
+}
+
+void checkWinCondition() {
+  boolean allCorrect = true;
+  for (int i = 0; i < 9; i++) {
+    for (int j = 0; j < 9; j++) {
+      if (sudokuBoard[i][j] != solutionBoard[i][j]) {
+        allCorrect = false;
+        break;
+      }
+    }
+    if (!allCorrect) break;
+  }
+  
+  if (allCorrect) {
+    gameWon = true;
+  }
 }
