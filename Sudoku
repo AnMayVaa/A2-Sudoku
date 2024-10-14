@@ -30,6 +30,7 @@ void draw() {
     displayTimer();
     displayMistakes();
     checkWinCondition();
+    displaySaveLoad();
   } else if (gameWon) {
     displayWinMessage();
   } else {
@@ -356,4 +357,10 @@ void clearGrid() {
       fixedCells[i][j] = false;
     }
   }
+}
+
+void displaySaveLoad() {
+  fill(0);
+  textSize(24);
+  text("Press 'S' to Save          Press 'L' to Load", width / 2, 580);
 }
